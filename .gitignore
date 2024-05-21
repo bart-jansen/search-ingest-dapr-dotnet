@@ -50,3 +50,5 @@ Debug/
 **/.dapr/deploy
 # Auto generated logs dir inside .dapr directory
 **/.dapr/logs
+
+secrets.json

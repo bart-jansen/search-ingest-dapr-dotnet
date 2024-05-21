@@ -2,11 +2,16 @@ version: 1
 common:
   resourcesPath: ./components
 apps:
-  - appID: order-processor
-    appDirPath: ./src/order-processor/
-    appPort: 7006
-    command: ["dotnet", "run"]
+  # - appID: order-processor
+  #   appDirPath: ./src/order-processor/
+  #   appPort: 7006
+  #   command: ["dotnet", "run"]
     
-  - appID: checkout-sdk
-    appDirPath: ./src/checkout/
+  # - appID: checkout-sdk
+  #   appDirPath: ./src/checkout/
+  #   command: ["dotnet", "run"]
+
+  - appID: batcher
+    appDirPath: ./src/batcher/
+    appPort: 7007
     command: ["dotnet", "run"]

@@ -1,0 +1,13 @@
+@batcher_HostAddress = http://localhost:7007
+
+POST {{batcher_HostAddress}}/batcher-trigger/
+Content-Type: application/json
+Accept: application/json
+
+
+{
+  "source_folder_path": "source_folder_path/",
+  "destination_folder_path": "uploadedPDFs/",
+  "searchitems_folder_path": "search_index_items/",
+  "searchindexer_name": "searchindexdemo"
+}
