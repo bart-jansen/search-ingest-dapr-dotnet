@@ -12,6 +12,8 @@ apps:
   #   command: ["dotnet", "run"]
 
   - appID: batcher
-    appDirPath: ./src/batcher/
+    appDirPath: ./src/Batcher/
     appPort: 7007
     command: ["dotnet", "run"]
+
+

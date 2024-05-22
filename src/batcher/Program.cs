@@ -1,20 +1,20 @@
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using batcher.Controllers; // Adjust the namespace accordingly
 
-var builder = WebApplication.CreateBuilder(args);
-
-var app = builder.Build();
-
-// Dapr configuration and middleware
-app.UseCloudEvents();
-app.MapSubscribeHandler();
-
-if (app.Environment.IsDevelopment())
+namespace Batcher
 {
-    app.UseDeveloperExceptionPage();
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }
 }
-
-BatcherController.MapRoutes(app);
-
-await app.RunAsync();

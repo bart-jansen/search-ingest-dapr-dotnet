@@ -1,24 +1,55 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using batcher.Models;
+using Microsoft.AspNetCore.Mvc;
+using Batcher.Models;
+using Batcher.Services;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace batcher.Controllers;
-public static class BatcherController
+namespace Batcher.Controllers
 {
-    public static void MapRoutes(WebApplication app)
+    [ApiController]
+    [Route("[controller]")]
+    public class BatcherController : ControllerBase
     {
-        app.MapPost("/batcher-trigger", HandleBatcherTrigger);
-    }
+        private readonly BlobService _blobService;
+        private readonly DaprService _daprService;
 
-    private static IResult HandleBatcherTrigger(IngestRequest request)
-    {
-        Console.WriteLine($"Trigger received: {request}");
-        // You might want to log more specific details from the request, for example:
-        Console.WriteLine($"Source Folder Path: {request.SourceFolderPath}");
-        Console.WriteLine($"Destination Folder Path: {request.DestinationFolderPath}");
-        Console.WriteLine($"Search Items Folder Path: {request.SearchItemsFolderPath}");
-        Console.WriteLine($"Search Indexer Name: {request.SearchIndexerName}");
+        public BatcherController(BlobService blobService, DaprService daprService)
+        {
+            _blobService = blobService;
+            _daprService = daprService;
+        }
 
-        return Results.Ok(request);
+        [HttpPost("batcher-trigger")]
+        public async Task<IActionResult> BatcherTrigger([FromBody] BatcherRequest request)
+        {
+            Console.WriteLine($"Trigger received: {request}");
+            if (request == null || string.IsNullOrEmpty(request.SourceFolderPath) ||
+                string.IsNullOrEmpty(request.SearchItemsFolderPath) || string.IsNullOrEmpty(request.SearchIndexerName))
+            {
+                return BadRequest(new { success = false, error = "All required fields must be provided." });
+            }
+
+            var blobSecret = await _daprService.GetSecretAsync("secretstore", "AZURE_BLOB_CONNECTION_STRING");
+            var blobContainerName = await _daprService.GetSecretAsync("secretstore", "BLOB_CONTAINER_NAME");
+
+            var blobs = await _blobService.ListBlobsAsync(blobSecret, blobContainerName, request.SourceFolderPath);
+
+            Console.WriteLine($"Found {blobs.Count} blobs in {request.SourceFolderPath}");
+
+            var ingestionId = _blobService.GenerateIngestionId();
+            var docIds = blobs.Select(blob => _daprService.PublishEventForBlob(blob, ingestionId)).ToList();
+
+            var state = new IngestionState
+            {
+                DocIds = docIds,
+                SearchItemsFolderPath = request.SearchItemsFolderPath,
+                SearchIndexerName = request.SearchIndexerName
+            };
+
+            await _daprService.SaveStateAsync($"ingestion-{ingestionId}", state);
+
+            return Ok(new { success = true });
+        }
     }
 }
