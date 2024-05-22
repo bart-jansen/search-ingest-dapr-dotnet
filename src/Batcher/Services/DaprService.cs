@@ -34,8 +34,9 @@ namespace Batcher.Services
                 BlobName = blob.Name
             };
 
-            var blobEventJson = JsonSerializer.Serialize(blobEvent, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-            _daprClient.PublishEventAsync("pubsub", "process-document", blobEventJson);
+            // to serialize or not to serialize?
+            // var blobEventJson = JsonSerializer.Serialize(blobEvent, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            _daprClient.PublishEventAsync("pubsub", "process-document", blobEvent);
 
             return docId;
         }

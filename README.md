@@ -26,6 +26,14 @@ With the following Dapr applications:
 - Dotnet Core 
 - Dapr
 
+**Infra requirements (manually setup):**
+- Azure Storage Account
+- Azure Document Intelligence
+- Azure Text Analytics
+- Azure AI Search
+
+> Deploy the resource above and populate `secrets.json`, use `secrets.example.json` as a starting point.
+
 **Instructions**:
 1. Install all services, go into each `./src/service-name/` and run `dotnet restore` and `dotnet build`
 1. Run `dapr init` to initialize Dapr
