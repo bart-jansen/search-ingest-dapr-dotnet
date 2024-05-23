@@ -3,6 +3,7 @@ using Dapr.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using GenerateKeyhprases.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,10 +35,34 @@ if (app.Environment.IsDevelopment())
 // }
 
 
+
+
+
 // Dapr subscription in [Topic] routes orders topic to this route
-app.MapPost("/generate-keyphrases", [Topic("pubsub", "generate-keyphrases")] (Batch batch , DaprClient daprClient) =>
+app.MapPost("/generate-keyphrases", [Topic("pubsub", "generate-keyphrases")] async (Batch batch , DaprClient daprClient) =>
 {
     Console.WriteLine("Chunk received : " + batch.batch_key);
+
+    // pause for 5 seconds
+
+    await Task.Delay(5000);
+    // get state from statestore
+    var state = await daprClient.GetStateAsync<List<Section>>("statestore", batch.batch_key);
+    Console.WriteLine("State received : " + state);
+
+
+    if (state != null)
+    {
+        Console.WriteLine("State retrieved successfully:");
+        foreach (var section in state)
+        {
+            Console.WriteLine($"Section: {section.Content}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("No state found.");
+    }
     // var processor = new DocumentProcessor(daprClient);
     // await processor.ProcessDocument(blobEvent);
 

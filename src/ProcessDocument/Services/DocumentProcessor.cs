@@ -46,6 +46,11 @@ namespace ProcessDocument.Services
 
                 var formRecognizerResult = await ProcessWithFormRecognizer(blobContent.Value.Content.ToStream(), frEndpoint, frKey);
 
+                if (docId == null || ingestionId == null)
+                {
+                    throw new ArgumentNullException(docId == null ? nameof(docId) : nameof(ingestionId), "Value cannot be null");
+                }
+
                 Console.WriteLine($"Processed document with Form Recognizer for {blobName}");
 
                 var sections = await DocumentChunker.CreateSections(blobName.Split('/').Last(), formRecognizerResult, docId, ingestionId);
@@ -79,7 +84,7 @@ namespace ProcessDocument.Services
         private async Task SaveAndPublishBatch(string ingestionId, string docId, int batchNr, List<Section> batchContent, int totalBatchSize)
         {
             var batchKey = $"section-output-{docId}-batch-{batchNr}";
-            await _daprClient.SaveStateAsync("statestore", batchKey, JsonSerializer.Serialize(batchContent));
+            await _daprClient.SaveStateAsync("statestore", batchKey, batchContent);
 
             var topics = new[] { "generate-embeddings", "generate-keyphrases", "generate-summaries" };
             foreach (var topic in topics)
