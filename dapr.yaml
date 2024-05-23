@@ -14,3 +14,11 @@ apps:
     command: ["dotnet", "run"]
 
 
+  - appID: GenerateKeyphrases
+    appDirPath: ./src/GenerateKeyphrases/
+    appPort: 7009
+    command: ["dotnet", "run"]
+
+
+
+
