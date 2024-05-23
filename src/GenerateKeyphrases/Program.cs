@@ -45,7 +45,7 @@ app.MapPost("/generate-keyphrases", [Topic("pubsub", "generate-keyphrases")] asy
 
     // pause for 5 seconds
 
-    await Task.Delay(5000);
+    // await Task.Delay(5000);
     // get state from statestore
     var state = await daprClient.GetStateAsync<List<Section>>("statestore", batch.batch_key);
     Console.WriteLine("State received : " + state);
