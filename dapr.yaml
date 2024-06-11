@@ -19,6 +19,16 @@ apps:
     appPort: 7009
     command: ["dotnet", "run"]
 
+  - appID: GenerateSummaries
+    appDirPath: ./src/GenerateSummaries/
+    appPort: 7010
+    command: ["dotnet", "run"]
+
+  - appID: GenerateEmbeddings
+    appDirPath: ./src/GenerateEmbeddings/
+    appPort: 7011
+    command: ["dotnet", "run"]  
+
 
 
 
